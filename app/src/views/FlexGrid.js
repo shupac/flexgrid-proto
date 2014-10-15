@@ -27,10 +27,10 @@ define(function(require, exports, module) {
 
     FlexGrid.DEFAULT_OPTIONS = {
         flexGutter: false,
-        minColGutter: 0,
         topMargin: 0,
         sideMargin: 0,
-        gutter: [0, 0],
+        colGutter: 0,
+        rowGutter: 0,
         itemSize: [0, 0],
         transition: false
     };
@@ -38,7 +38,9 @@ define(function(require, exports, module) {
     function _reflow(width) {
         if (!this._items) return;
 
-        var positions = _calcPositions.call(this, width);
+        var positions = this.options.flexGutter ?
+            _calcFlexPositions.call(this, width) :
+            _calcPositions.call(this, width);
         _animate.call(this, positions);
 
         this._eventOutput.emit('reflow');
@@ -46,12 +48,12 @@ define(function(require, exports, module) {
 
     function _calcPositions(width) {
         var positions = [];
-        var gutter = this.options.gutter;
+        var colGutter = this.options.colGutter;
         var itemSize = this.options.itemSize;
-        var ySpacing = gutter[0] + itemSize[0];
+        var ySpacing = colGutter + itemSize[0];
 
-        var numCols = Math.floor((width - 2 * this.options.sideMargin + gutter[0])/(gutter[0] + itemSize[0]));
-        var sideMargin = Math.max(this.options.sideMargin, (width - numCols * ySpacing + gutter[0])/2);
+        var numCols = Math.floor((width - 2 * this.options.sideMargin + colGutter)/(ySpacing));
+        var sideMargin = Math.max(this.options.sideMargin, (width - numCols * ySpacing + colGutter)/2);
 
         var col = 0;
         var row = 0;
@@ -59,8 +61,8 @@ define(function(require, exports, module) {
         var yPos;
 
         for (var i = 0; i < this._items.length; i++) {
-            xPos = sideMargin + col * (gutter[0] + itemSize[0]);
-            yPos = this.options.topMargin + row * (gutter[1] + itemSize[1]);
+            xPos = sideMargin + col * ySpacing;
+            yPos = this.options.topMargin + row * (this.options.rowGutter + itemSize[1]);
 
             positions.push([xPos, yPos]);
 
@@ -70,14 +72,39 @@ define(function(require, exports, module) {
                 col = 0;
             }
         }
-// debugger
+
         return positions;
     }
 
     function _calcFlexPositions(width) {
         var positions = [];
-        var gutter = this.options.minColGutter;
+        var colGutter = this.options.colGutter;
         var itemSize = this.options.itemSize;
+        var sideMargin = this.options.sideMargin;
+
+        var numCols = Math.floor((width - 2 * sideMargin + colGutter)/(colGutter + itemSize[0]));
+        colGutter = numCols > 1 ? Math.round((width - 2 * sideMargin - numCols * itemSize[0])/(numCols - 1)) : 0;
+        var ySpacing = itemSize[0] + colGutter;
+
+        var col = 0;
+        var row = 0;
+        var xPos;
+        var yPos;
+
+        for (var i = 0; i < this._items.length; i++) {
+            xPos = sideMargin + col * ySpacing;
+            yPos = this.options.topMargin + row * (this.options.rowGutter + itemSize[1]);
+
+            positions.push([xPos, yPos]);
+
+            col ++;
+            if (col === numCols) {
+                row++;
+                col = 0;
+            }
+        }
+
+        return positions;
     }
 
     function _animate(positions) {

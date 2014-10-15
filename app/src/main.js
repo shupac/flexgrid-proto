@@ -11,11 +11,11 @@ define(function(require, exports, module) {
     var mainContext = Engine.createContext();
 
     var flexGrid = new FlexGrid({
-        flexGutter: true,
-        sideMargin: 200,
+        // flexGutter: true,
+        sideMargin: 100,
         topMargin: 50,
-        minColGutter: 50,
-        gutter: [20, 50],
+        rowGutter: 20,
+        colGutter: 20,
         itemSize: [200, 150],
         transition: {
             curve: Easing.outBack,
