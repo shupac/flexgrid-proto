@@ -26,8 +26,10 @@ define(function(require, exports, module) {
     FlexGrid.prototype.constructor = FlexGrid;
 
     FlexGrid.DEFAULT_OPTIONS = {
-        minColGutter: undefined,
-        margin: [0, 0],
+        flexGutter: false,
+        minColGutter: 0,
+        topMargin: 0,
+        sideMargin: 0,
         gutter: [0, 0],
         itemSize: [0, 0],
         transition: false
@@ -46,9 +48,10 @@ define(function(require, exports, module) {
         var positions = [];
         var gutter = this.options.gutter;
         var itemSize = this.options.itemSize;
-        var margin = this.options.margin;
+        var ySpacing = gutter[0] + itemSize[0];
 
-        this._numCols = Math.floor((width - 2 * this.options.margin[0] + gutter[0])/(gutter[0] + itemSize[0]));
+        var numCols = Math.floor((width - 2 * this.options.sideMargin + gutter[0])/(gutter[0] + itemSize[0]));
+        var sideMargin = Math.max(this.options.sideMargin, (width - numCols * ySpacing + gutter[0])/2);
 
         var col = 0;
         var row = 0;
@@ -56,19 +59,25 @@ define(function(require, exports, module) {
         var yPos;
 
         for (var i = 0; i < this._items.length; i++) {
-            xPos = col * (gutter[0] + itemSize[0]);
-            yPos = row * (gutter[1] + itemSize[1]);
+            xPos = sideMargin + col * (gutter[0] + itemSize[0]);
+            yPos = this.options.topMargin + row * (gutter[1] + itemSize[1]);
 
             positions.push([xPos, yPos]);
 
             col ++;
-            if (col === this._numCols) {
+            if (col === numCols) {
                 row++;
                 col = 0;
             }
         }
-
+// debugger
         return positions;
+    }
+
+    function _calcFlexPositions(width) {
+        var positions = [];
+        var gutter = this.options.minColGutter;
+        var itemSize = this.options.itemSize;
     }
 
     function _animate(positions) {

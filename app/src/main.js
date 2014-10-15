@@ -11,6 +11,9 @@ define(function(require, exports, module) {
     var mainContext = Engine.createContext();
 
     var flexGrid = new FlexGrid({
+        flexGutter: true,
+        sideMargin: 200,
+        topMargin: 50,
         minColGutter: 50,
         gutter: [20, 50],
         itemSize: [200, 150],
