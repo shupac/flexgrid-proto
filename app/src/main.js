@@ -11,8 +11,9 @@ define(function(require, exports, module) {
     var mainContext = Engine.createContext();
 
     var flexGrid = new FlexGrid({
+        minColGutter: 50,
         gutter: [20, 50],
-        itemSize: [200, 100],
+        itemSize: [200, 150],
         transition: {
             curve: Easing.outBack,
             duration: 500
@@ -25,7 +26,6 @@ define(function(require, exports, module) {
 
     for (var i = 0; i < 24; i++) {
         var surface = new Surface({
-            size: [200, 100],
             properties: {
                 backgroundColor: "hsl(" + (i * 360 / 24) + ", 100%, 50%)"
             }
