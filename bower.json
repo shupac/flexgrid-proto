@@ -1,0 +1,32 @@
+{
+  "name": "flex",
+  "description": "E.g. Seed project to get started with Famo.us.",
+  "version": "0.1.0",
+  "homepage": "https://github.com/shupac/flex",
+  "authors": [{
+    "name": "Hongxu Liu",
+    "url": "http://github.com/shupac/"
+  }],
+  "main": "app/index.html",
+  "moduleType": [
+    "amd"
+  ],
+  "keywords": [
+    "famo.us"
+  ],
+  "license": "ISC",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "src/lib",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "requirejs": "~2.1.11",
+    "almond": "~0.2.9",
+    "famous-polyfills": "~0.3.0",
+    "famous": "~0.3.0-rc"
+  }
+}
