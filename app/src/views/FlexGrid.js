@@ -13,6 +13,7 @@ define(function(require, exports, module) {
     function FlexGrid() {
         View.apply(this, arguments);
 
+        this._width;
         this._modifiers = [];
         this._states = [];
         this._numCols;
@@ -31,7 +32,10 @@ define(function(require, exports, module) {
         transition: false
     };
 
-    function _reflow(size, result) {
+    function _reflow(size) {
+        console.log('reflow')
+        var spec = [];
+
         if (!this._items) return;
 
         var width = size[0];
@@ -46,7 +50,7 @@ define(function(require, exports, module) {
             xPos = this.options.margin[0] + col * (this.options.gutter[0] + this.options.itemSize[0]);
             yPos = this.options.margin[1] + row * (this.options.gutter[1] + this.options.itemSize[1]);
 
-            result.push({
+            spec.push({
                 target: this._items[i].render(),
                 transform: Transform.translate(xPos, yPos, 0)
             });
@@ -58,6 +62,7 @@ define(function(require, exports, module) {
             }
         }
 
+        this._specs = spec;
         this._eventOutput.emit('reflow');
     }
 
@@ -75,15 +80,16 @@ define(function(require, exports, module) {
         var origin = context.origin;
         var size = context.size;
 
-        var result = [];
-
-        _reflow.call(this, size, result);
+        if (this._width !== size[0]) {
+            _reflow.call(this, size);
+            this._width = size[0];
+        }
 
         return {
             transform: transform,
             opacity: opacity,
             size: size,
-            target: result
+            target: this._specs
         };
     };
 
