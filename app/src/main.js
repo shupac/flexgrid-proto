@@ -4,6 +4,7 @@ define(function(require, exports, module) {
     var Engine = require('famous/core/Engine');
     var Surface = require('famous/core/Surface');
     var Modifier = require('famous/core/Modifier');
+    var Easing = require('famous/transitions/Easing');
 
     var FlexGrid = require('views/FlexGrid');
 
@@ -11,18 +12,22 @@ define(function(require, exports, module) {
 
     var flexGrid = new FlexGrid({
         gutter: [20, 50],
-        itemSize: [200, 100]
+        itemSize: [200, 100],
+        transition: {
+            curve: Easing.outBack,
+            duration: 500
+        }
     });
 
     mainContext.add(flexGrid);
 
     var surfaces = [];
 
-    for (var i = 0; i < 12; i++) {
+    for (var i = 0; i < 24; i++) {
         var surface = new Surface({
             size: [200, 100],
             properties: {
-                backgroundColor: "hsl(" + (i * 360 / 12) + ", 100%, 50%)"
+                backgroundColor: "hsl(" + (i * 360 / 24) + ", 100%, 50%)"
             }
         });
 

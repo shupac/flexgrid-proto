@@ -13,7 +13,7 @@ define(function(require, exports, module) {
     function FlexGrid() {
         View.apply(this, arguments);
 
-        this._width;
+        this._cachedWidth;
         this._modifiers = [];
         this._states = [];
         this._numCols;
@@ -32,13 +32,18 @@ define(function(require, exports, module) {
         transition: false
     };
 
-    function _reflow(size) {
-        console.log('reflow')
-        var spec = [];
-
+    function _reflow(width) {
         if (!this._items) return;
 
-        var width = size[0];
+        var positions = _calcPositions.call(this, width);
+        _animate.call(this, positions);
+
+        this._eventOutput.emit('reflow');
+    }
+
+    function _calcPositions(width) {
+        var positions = [];
+
         this._numCols = Math.floor((width - 2 * this.options.margin[0] + this.options.gutter[0])/(this.options.gutter[0] + this.options.itemSize[0]));
 
         var col = 0;
@@ -50,10 +55,7 @@ define(function(require, exports, module) {
             xPos = this.options.margin[0] + col * (this.options.gutter[0] + this.options.itemSize[0]);
             yPos = this.options.margin[1] + row * (this.options.gutter[1] + this.options.itemSize[1]);
 
-            spec.push({
-                target: this._items[i].render(),
-                transform: Transform.translate(xPos, yPos, 0)
-            });
+            positions.push([xPos, yPos]);
 
             col ++;
             if (col === this._numCols) {
@@ -62,8 +64,33 @@ define(function(require, exports, module) {
             }
         }
 
-        this._specs = spec;
-        this._eventOutput.emit('reflow');
+        return positions;
+    }
+
+    function _animate(positions) {
+        for (var i = 0; i < positions.length; i++) {
+            var position = positions[i];
+            if (this._modifiers[i] === undefined) _createModifier.call(this, i, position);
+            else _animateModifier.call(this, i, position);
+        }
+    }
+
+    function _createModifier(index, position, opacity) {
+        var transform = new TransitionableTransform(Transform.translate.apply(null, position));
+
+        var modifier = new Modifier({
+            transform: transform,
+            size: this.options.itemSize
+        });
+
+        this._states[index] = transform;
+        this._modifiers[index] = modifier;
+    }
+
+    function _animateModifier(index, position, opacity) {
+        var transform = this._states[index];
+        transform.halt();
+        transform.setTranslate(position, this.options.transition);
     }
 
     FlexGrid.prototype.render = function render() {
@@ -79,17 +106,28 @@ define(function(require, exports, module) {
         var opacity = context.opacity;
         var origin = context.origin;
         var size = context.size;
+        var width = size[0];
 
-        if (this._width !== size[0]) {
-            _reflow.call(this, size);
-            this._width = size[0];
+        var specs = [];
+
+        if (this._cachedWidth !== width) {
+            _reflow.call(this, width);
+            this._cachedWidth = width;
+        }
+
+        for (var i = 0; i < this._modifiers.length; i++) {
+            var item = this._items[i];
+            var spec = this._modifiers[i].modify({
+                target: item.render()
+            });
+            specs.push(spec);
         }
 
         return {
             transform: transform,
             opacity: opacity,
             size: size,
-            target: this._specs
+            target: specs
         };
     };
 
