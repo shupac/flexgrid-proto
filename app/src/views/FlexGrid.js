@@ -38,16 +38,15 @@ define(function(require, exports, module) {
     function _reflow(width) {
         if (!this._items) return;
 
-        var positions = this.options.flexGutter ?
-            _calcFlexPositions.call(this, width) :
-            _calcPositions.call(this, width);
-        _animate.call(this, positions);
+        var states = this.options.flexGutter ?
+            _calcFlexSpacing.call(this, width) :
+            _calcSpacing.call(this, width);
+        _animate.call(this, states);
 
         this._eventOutput.emit('reflow');
     }
 
-    function _calcPositions(width) {
-        var positions = [];
+    function _calcSpacing(width) {
         var colGutter = this.options.colGutter;
         var itemSize = this.options.itemSize;
         var ySpacing = colGutter + itemSize[0];
@@ -55,29 +54,10 @@ define(function(require, exports, module) {
         var numCols = Math.floor((width - 2 * this.options.sideMargin + colGutter)/(ySpacing));
         var sideMargin = Math.max(this.options.sideMargin, (width - numCols * ySpacing + colGutter)/2);
 
-        var col = 0;
-        var row = 0;
-        var xPos;
-        var yPos;
-
-        for (var i = 0; i < this._items.length; i++) {
-            xPos = sideMargin + col * ySpacing;
-            yPos = this.options.topMargin + row * (this.options.rowGutter + itemSize[1]);
-
-            positions.push([xPos, yPos]);
-
-            col ++;
-            if (col === numCols) {
-                row++;
-                col = 0;
-            }
-        }
-
-        return positions;
+        return _calcStates.call(this, numCols, ySpacing, sideMargin, width);
     }
 
-    function _calcFlexPositions(width) {
-        var positions = [];
+    function _calcFlexSpacing(width) {
         var colGutter = this.options.colGutter;
         var itemSize = this.options.itemSize;
         var sideMargin = this.options.sideMargin;
@@ -86,14 +66,26 @@ define(function(require, exports, module) {
         colGutter = numCols > 1 ? Math.round((width - 2 * sideMargin - numCols * itemSize[0])/(numCols - 1)) : 0;
         var ySpacing = itemSize[0] + colGutter;
 
+        return _calcStates.call(this, numCols, ySpacing, sideMargin, width);
+    }
+
+    function _calcStates(numCols, ySpacing, sideMargin, width) {
+        var positions = [];
+        var size = this.options.itemSize;
         var col = 0;
         var row = 0;
         var xPos;
         var yPos;
 
+        if (numCols <= 1) {
+            numCols = 1;
+            sideMargin = 0;
+            size = [width, this.options.itemSize[1]];
+        }
+
         for (var i = 0; i < this._items.length; i++) {
             xPos = sideMargin + col * ySpacing;
-            yPos = this.options.topMargin + row * (this.options.rowGutter + itemSize[1]);
+            yPos = this.options.topMargin + row * (this.options.rowGutter + this.options.itemSize[1]);
 
             positions.push([xPos, yPos]);
 
@@ -104,33 +96,44 @@ define(function(require, exports, module) {
             }
         }
 
-        return positions;
+        return {
+            positions: positions,
+            size: size
+        };
     }
 
-    function _animate(positions) {
-        for (var i = 0; i < positions.length; i++) {
-            var position = positions[i];
-            if (this._modifiers[i] === undefined) _createModifier.call(this, i, position);
-            else _animateModifier.call(this, i, position);
+    function _animate(states) {
+        var size = states.size;
+        for (var i = 0; i < states.positions.length; i++) {
+            var position = states.positions[i];
+
+            if (this._modifiers[i] === undefined) _createModifier.call(this, i, position, size);
+            else _animateModifier.call(this, i, position, size);
         }
     }
 
-    function _createModifier(index, position, opacity) {
-        var transform = new TransitionableTransform(Transform.translate.apply(null, position));
+    function _createModifier(index, position, size) {
+        var transitionItem = {
+            transform: new TransitionableTransform(Transform.translate.apply(null, position)),
+            size: new Transitionable((size || this.options.itemSize))
+        }
 
         var modifier = new Modifier({
-            transform: transform,
-            size: this.options.itemSize
+            transform: transitionItem.transform,
+            size: transitionItem.size
         });
 
-        this._states[index] = transform;
+        this._states[index] = transitionItem;
         this._modifiers[index] = modifier;
     }
 
-    function _animateModifier(index, position, opacity) {
-        var transform = this._states[index];
-        transform.halt();
-        transform.setTranslate(position, this.options.transition);
+    function _animateModifier(index, position, size) {
+        var transformTransitionable = this._states[index].transform;
+        var sizeTransitionable = this._states[index].size;
+        transformTransitionable.halt();
+        sizeTransitionable.halt();
+        transformTransitionable.setTranslate(position, this.options.transition);
+        sizeTransitionable.set(size, this.options.transition);
     }
 
     FlexGrid.prototype.render = function render() {

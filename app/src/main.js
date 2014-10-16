@@ -11,7 +11,7 @@ define(function(require, exports, module) {
     var mainContext = Engine.createContext();
 
     var flexGrid = new FlexGrid({
-        // flexGutter: true,
+        flexGutter: true,
         sideMargin: 100,
         topMargin: 50,
         rowGutter: 20,
