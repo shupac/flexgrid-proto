@@ -13,11 +13,10 @@ define(function(require, exports, module) {
     function FlexGrid() {
         View.apply(this, arguments);
 
-        this._cachedWidth;
+        this._cachedWidth = null;
+        this._height = null;
         this._modifiers = [];
         this._states = [];
-        this._numCols;
-        this._activeCount = 0;
 
         this.id = Entity.register(this);
     }
@@ -27,6 +26,7 @@ define(function(require, exports, module) {
 
     FlexGrid.DEFAULT_OPTIONS = {
         flexGutter: false,
+        minCol: 2,
         topMargin: 0,
         sideMargin: 0,
         colGutter: 0,
@@ -51,7 +51,7 @@ define(function(require, exports, module) {
         var itemSize = this.options.itemSize;
         var ySpacing = colGutter + itemSize[0];
 
-        var numCols = Math.floor((width - 2 * this.options.sideMargin + colGutter)/(ySpacing));
+        var numCols = Math.min(Math.floor((width - 2 * this.options.sideMargin + colGutter)/(ySpacing)), this._items.length);
         var sideMargin = Math.max(this.options.sideMargin, (width - numCols * ySpacing + colGutter)/2);
 
         return _calcStates.call(this, numCols, ySpacing, sideMargin, width);
@@ -62,7 +62,7 @@ define(function(require, exports, module) {
         var itemSize = this.options.itemSize;
         var sideMargin = this.options.sideMargin;
 
-        var numCols = Math.floor((width - 2 * sideMargin + colGutter)/(colGutter + itemSize[0]));
+        var numCols = Math.min(Math.floor((width - 2 * sideMargin + colGutter)/(colGutter + itemSize[0])), this._items.length);
         colGutter = numCols > 1 ? Math.round((width - 2 * sideMargin - numCols * itemSize[0])/(numCols - 1)) : 0;
         var ySpacing = itemSize[0] + colGutter;
 
@@ -77,7 +77,7 @@ define(function(require, exports, module) {
         var xPos;
         var yPos;
 
-        if (numCols <= 1) {
+        if (numCols < this.options.minCol) {
             numCols = 1;
             sideMargin = 0;
             size = [width, this.options.itemSize[1]];
@@ -94,7 +94,11 @@ define(function(require, exports, module) {
                 row++;
                 col = 0;
             }
+
+            this._height = yPos
         }
+
+        this._height += this.options.itemSize[1] + this.options.topMargin;
 
         return {
             positions: positions,
@@ -172,6 +176,11 @@ define(function(require, exports, module) {
             size: size,
             target: specs
         };
+    };
+
+    FlexGrid.prototype.getSize = function getSize() {
+        console.log(this._height);
+        return [this._cachedWidth, this._height];
     };
 
     module.exports = FlexGrid;

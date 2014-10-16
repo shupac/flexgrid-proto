@@ -4,33 +4,29 @@ define(function(require, exports, module) {
     var Engine = require('famous/core/Engine');
     var Surface = require('famous/core/Surface');
     var Modifier = require('famous/core/Modifier');
-    var Easing = require('famous/transitions/Easing');
+    var Scrollview = require('famous/views/Scrollview');
+
+    var AppConfig = require('AppConfig');
+    var AppConfig = require('AppConfigFlex');
 
     var FlexGrid = require('views/FlexGrid');
 
     var mainContext = Engine.createContext();
+    var scrollview = new Scrollview();
+    var flexGrid = new FlexGrid(AppConfig);
 
-    var flexGrid = new FlexGrid({
-        flexGutter: true,
-        sideMargin: 100,
-        topMargin: 50,
-        rowGutter: 20,
-        colGutter: 20,
-        itemSize: [200, 150],
-        transition: {
-            curve: Easing.outBack,
-            duration: 500
-        }
-    });
-
-    mainContext.add(flexGrid);
+    // mainContext.add(flexGrid);
+    mainContext.add(scrollview);
+    scrollview.sequenceFrom([flexGrid]);
+    Engine.pipe(scrollview);
 
     var surfaces = [];
+    var numItems = 24;
 
-    for (var i = 0; i < 24; i++) {
+    for (var i = 0; i < numItems; i++) {
         var surface = new Surface({
             properties: {
-                backgroundColor: "hsl(" + (i * 360 / 24) + ", 100%, 50%)"
+                backgroundColor: "hsl(" + (i * 360 / numItems) + ", 100%, 50%)"
             }
         });
 
