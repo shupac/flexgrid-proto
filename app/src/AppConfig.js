@@ -7,10 +7,11 @@ define(function(require, exports, module) {
         topMargin: 50,
         rowGutter: 20,
         colGutter: 40,
-        itemSize: [200, 100],
+        itemSize: [150, 100],
         transition: {
             curve: Easing.outBack,
             duration: 500
-        }
+        },
+        numItems: 24
     };
 });

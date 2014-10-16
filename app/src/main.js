@@ -7,7 +7,7 @@ define(function(require, exports, module) {
     var Scrollview = require('famous/views/Scrollview');
 
     var AppConfig = require('AppConfig');
-    var AppConfig = require('AppConfigFlex');
+    // var AppConfig = require('AppConfigFlex');
 
     var FlexGrid = require('views/FlexGrid');
 
@@ -20,7 +20,7 @@ define(function(require, exports, module) {
     Engine.pipe(scrollview);
 
     var surfaces = [];
-    var numItems = 3;
+    var numItems = AppConfig.numItems;
 
     for (var i = 0; i < numItems; i++) {
         var surface = new Surface({
