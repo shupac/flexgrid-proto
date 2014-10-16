@@ -8,7 +8,7 @@ define(function(require, exports, module) {
         topMargin: 100,
         rowGutter: 0,
         colGutter: 20,
-        itemSize: [200, 100],
+        itemSize: [200, 400],
         transition: {
             curve: Easing.outBack,
             duration: 500

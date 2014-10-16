@@ -15,13 +15,12 @@ define(function(require, exports, module) {
     var scrollview = new Scrollview();
     var flexGrid = new FlexGrid(AppConfig);
 
-    // mainContext.add(flexGrid);
     mainContext.add(scrollview);
     scrollview.sequenceFrom([flexGrid]);
     Engine.pipe(scrollview);
 
     var surfaces = [];
-    var numItems = 24;
+    var numItems = 3;
 
     for (var i = 0; i < numItems; i++) {
         var surface = new Surface({

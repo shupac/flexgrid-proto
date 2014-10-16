@@ -179,7 +179,7 @@ define(function(require, exports, module) {
     };
 
     FlexGrid.prototype.getSize = function getSize() {
-        console.log(this._height);
+        if (!this._height) return;
         return [this._cachedWidth, this._height];
     };
 
