@@ -1,14 +1,10 @@
 define(function(require, exports, module) {
+    var View = require('famous/core/View');
     var Entity = require('famous/core/Entity');
-    var RenderNode = require('famous/core/RenderNode');
-    var Transform = require('famous/core/Transform');
-    var ViewSequence = require('famous/core/ViewSequence');
-    var EventHandler = require('famous/core/EventHandler');
     var Modifier = require('famous/core/Modifier');
-    var OptionsManager = require('famous/core/OptionsManager');
+    var Transform = require('famous/core/Transform');
     var Transitionable = require('famous/transitions/Transitionable');
     var TransitionableTransform = require('famous/transitions/TransitionableTransform');
-    var View = require('famous/core/View');
 
     function FlexGrid() {
         View.apply(this, arguments);
