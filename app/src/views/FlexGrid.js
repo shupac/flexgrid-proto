@@ -1,14 +1,7 @@
 define(function(require, exports, module) {
-    var Entity = require('famous/core/Entity');
-    var RenderNode = require('famous/core/RenderNode');
-    var Transform = require('famous/core/Transform');
-    var ViewSequence = require('famous/core/ViewSequence');
-    var EventHandler = require('famous/core/EventHandler');
-    var Modifier = require('famous/core/Modifier');
-    var OptionsManager = require('famous/core/OptionsManager');
-    var Transitionable = require('famous/transitions/Transitionable');
-    var TransitionableTransform = require('famous/transitions/TransitionableTransform');
     var View = require('famous/core/View');
+    var Entity = require('famous/core/Entity');
+    var Transform = require('famous/core/Transform');
 
     function FlexGrid() {
         View.apply(this, arguments);
@@ -30,7 +23,6 @@ define(function(require, exports, module) {
     };
 
     function _reflow(size) {
-        console.log('reflow')
         var spec = [];
 
         if (!this._items) return;
