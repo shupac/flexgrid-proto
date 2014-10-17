@@ -13,11 +13,8 @@ define(function(require, exports, module) {
     function FlexGrid() {
         View.apply(this, arguments);
 
-        this._width;
-        this._modifiers = [];
-        this._states = [];
-        this._numCols;
-        this._activeCount = 0;
+        this._cachedWidth;
+        this._cachedSpec;
 
         this.id = Entity.register(this);
     }
@@ -39,12 +36,13 @@ define(function(require, exports, module) {
         if (!this._items) return;
 
         var width = size[0];
-        this._numCols = Math.floor((width - 2 * this.options.margin[0] + this.options.gutter[0])/(this.options.gutter[0] + this.options.itemSize[0]));
+        numCols = Math.floor((width - 2 * this.options.margin[0] + this.options.gutter[0])/(this.options.gutter[0] + this.options.itemSize[0]));
 
         var col = 0;
         var row = 0;
         var xPos;
         var yPos;
+        var numCols;
 
         for (var i = 0; i < this._items.length; i++) {
             xPos = this.options.margin[0] + col * (this.options.gutter[0] + this.options.itemSize[0]);
@@ -56,22 +54,22 @@ define(function(require, exports, module) {
             });
 
             col ++;
-            if (col === this._numCols) {
+            if (col === numCols) {
                 row++;
                 col = 0;
             }
         }
 
-        this._specs = spec;
         this._eventOutput.emit('reflow');
+        return spec;
     }
-
-    FlexGrid.prototype.render = function render() {
-        return this.id;
-    };
 
     FlexGrid.prototype.sequenceFrom = function sequenceFrom(items) {
         this._items = items;
+    };
+
+    FlexGrid.prototype.render = function render() {
+        return this.id;
     };
 
     FlexGrid.prototype.commit = function commit(context) {
@@ -80,16 +78,16 @@ define(function(require, exports, module) {
         var origin = context.origin;
         var size = context.size;
 
-        if (this._width !== size[0]) {
-            _reflow.call(this, size);
-            this._width = size[0];
+        if (this._cachedWidth !== size[0]) {
+            this._cachedSpec = _reflow.call(this, size);
+            this._cachedWidth = size[0];
         }
 
         return {
             transform: transform,
             opacity: opacity,
             size: size,
-            target: this._specs
+            target: this._cachedSpec
         };
     };
 
