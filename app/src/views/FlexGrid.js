@@ -145,9 +145,6 @@ define(function(require, exports, module) {
     };
 
     FlexGrid.prototype.commit = function commit(context) {
-        var transform = context.transform;
-        var opacity = context.opacity;
-        var origin = context.origin;
         var size = context.size;
         var width = size[0];
 
@@ -166,12 +163,7 @@ define(function(require, exports, module) {
             specs.push(spec);
         }
 
-        return {
-            transform: transform,
-            opacity: opacity,
-            size: size,
-            target: specs
-        };
+        return specs;
     };
 
     FlexGrid.prototype.getSize = function getSize() {
