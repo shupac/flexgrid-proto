@@ -65,9 +65,6 @@ define(function(require, exports, module) {
     };
 
     FlexGrid.prototype.commit = function commit(context) {
-        var transform = context.transform;
-        var opacity = context.opacity;
-        var origin = context.origin;
         var size = context.size;
 
         if (this._cachedWidth !== size[0]) {
@@ -75,12 +72,7 @@ define(function(require, exports, module) {
             this._cachedWidth = size[0];
         }
 
-        return {
-            transform: transform,
-            opacity: opacity,
-            size: size,
-            target: this._cachedSpec
-        };
+        return this._cachedSpec;
     };
 
     module.exports = FlexGrid;
